@@ -7,13 +7,13 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 0.0f;
 
-    private Rigidbody rigidbody;
+    private Rigidbody rb;
     private Vector2 movement;
 
     // Start is called before the first frame update
     void Start()
     {
-        rigidbody = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
     }
 
     void OnMove(InputValue movementValue)
@@ -24,6 +24,6 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 movementVector = new Vector3(movement.x, 0.0f, movement.y);
-        rigidbody.AddForce(movementVector * speed);
+        rb.AddForce(movementVector * speed);
     }
 }
