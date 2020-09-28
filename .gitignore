@@ -1,4 +1,6 @@
 /UserSettings/
 /Library/
 /Temp/
+/Build/
+/obj/
 /.vscode/
