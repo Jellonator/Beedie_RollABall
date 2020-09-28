@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Vector2 movement;
 
+    private int count = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +33,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Pickup")) {
             other.gameObject.SetActive(false);
+            count += 1;
         }
     }
 }
