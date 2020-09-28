@@ -26,4 +26,9 @@ public class PlayerController : MonoBehaviour
         Vector3 movementVector = new Vector3(movement.x, 0.0f, movement.y);
         rb.AddForce(movementVector * speed);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        other.gameObject.SetActive(false);
+    }
 }
