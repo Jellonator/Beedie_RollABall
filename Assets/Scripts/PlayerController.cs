@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    // public float speed = 0.0f;
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
+    public float outOfBoundsTime = 2.5f;
 
     private Rigidbody rb;
-    // private Vector2 movement;
 
     private int count = 0;
+    private int numCollisions = 0;
+    private float oobTimer = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -21,11 +23,6 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         SetCountText();
         winTextObject.SetActive(false);
-    }
-
-    void OnMove(InputValue movementValue)
-    {
-        // movement = movementValue.Get<Vector2>();
     }
 
     void SetCountText()
@@ -36,10 +33,26 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    void OnCollisionEnter()
     {
-        // Vector3 movementVector = new Vector3(movement.x, 0.0f, movement.y);
-        // rb.AddForce(movementVector * speed);
+        numCollisions += 1;
+    }
+
+    void OnCollisionExit()
+    {
+        numCollisions -= 1;
+    }
+
+    void Update()
+    {
+        if (numCollisions == 0) {
+            oobTimer += Time.deltaTime;
+        } else {
+            oobTimer = 0.0f;
+        }
+        if (oobTimer >= outOfBoundsTime) {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
