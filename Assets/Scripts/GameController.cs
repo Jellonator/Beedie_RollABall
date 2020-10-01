@@ -12,7 +12,7 @@ public class GameController : MonoBehaviour
     // Reference to the Camera's parent
     public GameObject cameraParentReference;
     // Base gravity direction (points down, will be rotated)
-    private Vector3 baseGravity = new Vector3(0f, -1f, 0f) * 9.8f;
+    private Vector3 baseGravity = new Vector3(0f, -1f, 0f) * 25.0f;
     // Movement pulled from OnMove
     private Vector2 movement = Vector2.zero;
 
@@ -30,7 +30,7 @@ public class GameController : MonoBehaviour
         Vector3 y_axis = cameraReference.transform.forward;
         // Rotate the game around the axis
         // Rotate around the X axis by the Y input, and vice versa
-        transform.RotateAround(Vector3.zero, x_axis, movement.y);
+        transform.RotateAround(Vector3.zero, x_axis, -movement.y);
         transform.RotateAround(Vector3.zero, y_axis, movement.x);
         // Apply the rotation
         cameraParentReference.transform.rotation = transform.rotation;
