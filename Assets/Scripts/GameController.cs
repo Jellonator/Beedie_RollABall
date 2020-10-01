@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class GameController : MonoBehaviour
 {
+    // Reference to compass
+    public GameObject compassReference;
     // Reference to the Camera itself
     public GameObject cameraReference;
     // Reference to the Camera's parent
@@ -25,7 +27,7 @@ public class GameController : MonoBehaviour
     {
         // Get the view axis to rotate the game by
         Vector3 x_axis = cameraReference.transform.right;
-        Vector3 y_axis = cameraReference.transform.up;
+        Vector3 y_axis = cameraReference.transform.forward;
         // Rotate the game around the axis
         // Rotate around the X axis by the Y input, and vice versa
         transform.RotateAround(Vector3.zero, x_axis, movement.y);
@@ -33,5 +35,6 @@ public class GameController : MonoBehaviour
         // Apply the rotation
         cameraParentReference.transform.rotation = transform.rotation;
         Physics.gravity = transform.rotation * baseGravity;
+        compassReference.transform.rotation = transform.rotation;
     }
 }
