@@ -25,6 +25,10 @@ public class GameController : MonoBehaviour
     private bool shouldLock = false;
     /// The normal to rotate towards when locking
     private Vector3 lockDirection = Vector3.up;
+    /// Mouse movement
+    private Vector2 mouseMovement = Vector2.zero;
+    /// Mouse down
+    private bool mouseDown = false;
 
     void Start()
     {
@@ -42,6 +46,14 @@ public class GameController : MonoBehaviour
         look = lookValue.Get<Vector2>();
     }
 
+    void OnMouseDown(InputValue mouseValue) {
+        mouseDown = mouseValue.Get<float>() > 0.5f;
+    }
+
+    void OnMouseLook(InputValue mouseValue) {
+        mouseMovement = mouseValue.Get<Vector2>();
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -57,11 +69,16 @@ public class GameController : MonoBehaviour
         transform.RotateAround(Vector3.zero, x_axis, -movement.y);
         // When the player rotates left or right, rotate around the Z view axis
         transform.RotateAround(Vector3.zero, z_axis, movement.x);
+        // mouse movement
+        if (mouseDown) {
+            transform.RotateAround(Vector3.zero, cameraReference.transform.right, -mouseMovement.y * 0.25f);
+            transform.RotateAround(Vector3.zero, cameraReference.transform.forward, mouseMovement.x * 0.25f);
+        }
         // When the player rotates the view such that:
         //  * The new rotation is approaching the player's ground normal
         //  * the new rotation is sufficiently close to the ground normal,
         // Make the rotation approach the actual ground normal.
-        if (movement.magnitude > 1e-3) {
+        if (movement.magnitude > 1e-3 || (mouseDown && mouseMovement.magnitude > 1e-3)) {
             // Current view normal
             Vector3 new_dir = transform.rotation * Vector3.up;
             // Disable lock
@@ -79,7 +96,7 @@ public class GameController : MonoBehaviour
                 }
             }
         // Only lock if player is not giving inputs
-        } else if (shouldLock) {
+        } else if (shouldLock && !mouseDown) {
             // Get the target rotation (lock direction is UP vector)
             // Correct the forward direction by calculating the right direction,
             // then using that to calculate a new forward direction
