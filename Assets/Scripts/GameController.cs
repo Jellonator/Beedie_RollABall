@@ -29,9 +29,16 @@ public class GameController : MonoBehaviour
     private Vector2 mouseMovement = Vector2.zero;
     /// Mouse down
     private bool mouseDown = false;
+    /// Mouse offset
+    private Vector2 mouseOffset = Vector2.zero;
 
     void Start()
     {
+        if (SystemInfo.operatingSystemFamily != OperatingSystemFamily.Linux && !Application.isEditor) {
+            // for some reason this specifically does not work in the Linux editor
+            // https://issuetracker.unity3d.com/issues/linux-inputsystems-mouse-delta-values-do-not-change-when-the-cursor-lockstate-is-set-to-locked
+            Cursor.lockState = CursorLockMode.Locked;
+        }
         playerController = playerReference.GetComponent<PlayerController>();
     }
 
@@ -57,6 +64,11 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Can't use MouseLook event because it doesn't understand mouse lock
+        // mouseMovement = new Vector2(
+        //     Input.GetAxis("Mouse X"),
+        //     Input.GetAxis("Mouse Y")
+        // );
         // Get the view axis to rotate the game by
         Vector3 x_axis = cameraReference.transform.right;
         Vector3 y_axis = cameraReference.transform.up;
@@ -71,8 +83,10 @@ public class GameController : MonoBehaviour
         transform.RotateAround(Vector3.zero, z_axis, movement.x);
         // mouse movement
         if (mouseDown) {
-            transform.RotateAround(Vector3.zero, cameraReference.transform.right, -mouseMovement.y * 0.25f);
-            transform.RotateAround(Vector3.zero, cameraReference.transform.forward, mouseMovement.x * 0.25f);
+            transform.RotateAround(Vector3.zero, x_axis, -mouseMovement.y * 0.25f);
+            transform.RotateAround(Vector3.zero, z_axis, mouseMovement.x * 0.25f);
+        } else {
+            transform.RotateAround(Vector3.zero, y_axis, mouseMovement.x * 0.25f);
         }
         // When the player rotates the view such that:
         //  * The new rotation is approaching the player's ground normal
