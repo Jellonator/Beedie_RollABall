@@ -36,7 +36,7 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        if (SystemInfo.operatingSystemFamily != OperatingSystemFamily.Linux && !Application.isEditor) {
+        if (SystemInfo.operatingSystemFamily != OperatingSystemFamily.Linux || !Application.isEditor) {
             // for some reason this specifically does not work in the Linux editor
             // https://issuetracker.unity3d.com/issues/linux-inputsystems-mouse-delta-values-do-not-change-when-the-cursor-lockstate-is-set-to-locked
             Cursor.lockState = CursorLockMode.Locked;
