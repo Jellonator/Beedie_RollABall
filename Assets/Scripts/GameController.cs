@@ -7,6 +7,8 @@ public class GameController : MonoBehaviour
 {
     /// Reference to compass (the UI object that is rotated)
     public GameObject compassReference;
+    /// Reference to compass camera
+    public GameObject compassCameraReference;
     /// Reference to the Camera itself
     public GameObject cameraReference;
     /// Reference to camera's controller
@@ -149,5 +151,6 @@ public class GameController : MonoBehaviour
         compassReference.transform.rotation = Quaternion.Inverse(transform.rotation);
         // Set view rotation
         cameraController.cameraRotation.transform.localEulerAngles = new Vector3(viewRotation, 0, 0);
+        compassCameraReference.transform.localEulerAngles = new Vector3(viewRotation, 0, 0);
     }
 }
