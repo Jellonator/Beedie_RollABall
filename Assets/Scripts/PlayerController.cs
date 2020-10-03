@@ -18,6 +18,19 @@ public class PlayerController : MonoBehaviour
     private int numCollisions = 0;
     /// Timer used to track the amount of time that the player is considered OOB
     private float oobTimer = 0.0f;
+    /// Player's current ground normal (if isOnGround is true)
+    [HideInInspector]
+    public Vector3 groundNormal = Vector3.up;
+    /// Whether player is on the ground
+    [HideInInspector]
+    public bool isOnGround = true;
+    /// Air drag
+    public float dragAir = 0f;
+    public float angularDragAir = 0f;
+    public float dragGround = 0.25f;
+    public float angularDragGround = 0.2f;
+    public float dragStop = 1.2f;
+    public float angularDragStop = 1.0f;
 
     void Start()
     {
@@ -59,6 +72,34 @@ public class PlayerController : MonoBehaviour
         if (oobTimer >= outOfBoundsTime) {
             // Restart scene when OOB timer is large enough
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+    }
+    
+    void FixedUpdate()
+    {
+        // Determine ground normal using raycast
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Physics.gravity.normalized, out hit, 0.75f)) {
+            isOnGround = true;
+            groundNormal = hit.normal;
+        } else {
+            isOnGround = false;
+        }
+        // Modify drag
+        if (isOnGround) {
+            if (Vector3.Dot(Physics.gravity.normalized, groundNormal) < -0.998f) {
+                // Gravity is in line with normal, try to stop.
+                rb.drag = dragStop;
+                rb.angularDrag = angularDragStop;
+            } else {
+                // Use ground drag
+                rb.drag = dragGround;
+                rb.angularDrag = angularDragGround;
+            }
+        } else {
+            // Use air drag
+            rb.drag = dragAir;
+            rb.angularDrag = angularDragAir;
         }
     }
 
