@@ -7430,6 +7430,7 @@ MonoBehaviour:
   compassReference: {fileID: 1237877530}
   cameraReference: {fileID: 1066480262}
   cameraParentReference: {fileID: 1227516428}
+  playerReference: {fileID: 235722821}
 --- !u!4 &1995622017
 Transform:
   m_ObjectHideFlags: 0
