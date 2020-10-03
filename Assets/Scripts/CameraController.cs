@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         parent = gameObject.transform.parent.gameObject;
     }
 
