@@ -13,6 +13,8 @@ public class GameController : MonoBehaviour
     public GameObject cameraParentReference;
     /// Reference to the player
     public GameObject playerReference;
+    /// Reference to PlayerController
+    private PlayerController playerController;
     /// Base gravity direction (points down, will be rotated)
     private Vector3 baseGravity = new Vector3(0f, -1f, 0f) * 25.0f;
     /// Movement pulled from OnMove
@@ -23,6 +25,11 @@ public class GameController : MonoBehaviour
     private bool shouldLock = false;
     /// The normal to rotate towards when locking
     private Vector3 lockDirection = Vector3.up;
+
+    void Start()
+    {
+        playerController = playerReference.GetComponent<PlayerController>();
+    }
 
     // Handle inputs
     void OnMove(InputValue movementValue)
@@ -57,26 +64,28 @@ public class GameController : MonoBehaviour
         if (movement.magnitude > 1e-3) {
             // Current view normal
             Vector3 new_dir = transform.rotation * Vector3.up;
-            // Raycast to get the player's ground normal.
-            RaycastHit hit;
             // Disable lock
             shouldLock = false;
-            if (Physics.Raycast(playerReference.transform.position, Physics.gravity.normalized, out hit, 0.75f)) {
+            if (playerController.isOnGround) {
                 // Compare dot products with the player's ground normal.
                 // Check that the new view normal is similar to the ground normal,
                 // and that it's closer than the previous view normal.
-                float prev_dot = Vector3.Dot(hit.normal, prev_dir);
-                float new_dot = Vector3.Dot(hit.normal, new_dir);
+                float prev_dot = Vector3.Dot(playerController.groundNormal, prev_dir);
+                float new_dot = Vector3.Dot(playerController.groundNormal, new_dir);
                 if (new_dot > 0.99f && (new_dot > prev_dot || new_dot > 0.999f)) {
                     // Enable lock
                     shouldLock = true;
-                    lockDirection = hit.normal;
+                    lockDirection = playerController.groundNormal;
                 }
             }
         // Only lock if player is not giving inputs
         } else if (shouldLock) {
             // Get the target rotation (lock direction is UP vector)
-            Quaternion target = Quaternion.LookRotation(z_axis, lockDirection);
+            // Correct the forward direction by calculating the right direction,
+            // then using that to calculate a new forward direction
+            Vector3 right = Vector3.Cross(lockDirection, z_axis);
+            Vector3 forward = Vector3.Cross(right, lockDirection);
+            Quaternion target = Quaternion.LookRotation(forward, lockDirection);
             // Get the difference between the target view normal and the current view normal
             float diff = Quaternion.Angle(transform.rotation, target);
             if (diff <= Time.deltaTime * 10f) {
