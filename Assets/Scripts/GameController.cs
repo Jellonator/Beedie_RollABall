@@ -38,6 +38,7 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        // Lock mouse
         if (SystemInfo.operatingSystemFamily != OperatingSystemFamily.Linux || !Application.isEditor) {
             // for some reason this specifically does not work in the Linux editor
             // https://issuetracker.unity3d.com/issues/linux-inputsystems-mouse-delta-values-do-not-change-when-the-cursor-lockstate-is-set-to-locked
@@ -47,21 +48,24 @@ public class GameController : MonoBehaviour
         cameraController = cameraReference.GetComponent<CameraController>();
     }
 
-    // Handle inputs
+    /// Move action - rotate world
     void OnMove(InputValue movementValue)
     {
         movement = movementValue.Get<Vector2>();
     }
 
+    /// Look action - rotate view
     void OnLook(InputValue lookValue)
     {
         look = lookValue.Get<Vector2>();
     }
 
+    /// Mouse down - determine if mouse should affect view or world
     void OnMouseDown(InputValue mouseValue) {
         mouseDown = mouseValue.Get<float>() > 0.5f;
     }
 
+    /// Mouse look - can rotate view or world
     void OnMouseLook(InputValue mouseValue) {
         mouseMovement = mouseValue.Get<Vector2>();
     }
@@ -88,11 +92,13 @@ public class GameController : MonoBehaviour
         transform.RotateAround(Vector3.zero, z_axis, movement.x);
         // When player looks up or down, rotate view
         viewRotation = Mathf.Clamp(viewRotation - look.y, -90f, 90f);
-        // mouse movement, similar to above
+        // mouse movement, similar to above.
         if (mouseDown) {
+            // Mouse is down, rotate world
             transform.RotateAround(Vector3.zero, x_axis, -mouseMovement.y * 0.25f);
             transform.RotateAround(Vector3.zero, z_axis, mouseMovement.x * 0.25f);
         } else {
+            // Mouse is released, rotate view
             transform.RotateAround(Vector3.zero, y_axis, mouseMovement.x * 0.25f);
             viewRotation = Mathf.Clamp(viewRotation - mouseMovement.y * 0.25f, -90f, 90f);
         }
@@ -151,6 +157,7 @@ public class GameController : MonoBehaviour
         compassReference.transform.rotation = Quaternion.Inverse(transform.rotation);
         // Set view rotation
         cameraController.cameraRotation.transform.localEulerAngles = new Vector3(viewRotation, 0, 0);
+        // Set view rotation for the compass
         compassCameraReference.transform.localEulerAngles = new Vector3(viewRotation, 0, 0);
     }
 }

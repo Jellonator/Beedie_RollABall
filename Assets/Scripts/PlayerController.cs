@@ -7,10 +7,13 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    /// Count text object in UI
     public TextMeshProUGUI countText;
+    /// Win text object in UI
     public GameObject winTextObject;
     /// The amount of time that the player may be OOB before restarting a level
     public float outOfBoundsTime = 2.5f;
+    /// Player's Rigidbody component
     private Rigidbody rb;
     /// The number of collectibles that the player has collected
     private int count = 0;
@@ -24,12 +27,17 @@ public class PlayerController : MonoBehaviour
     /// Whether player is on the ground
     [HideInInspector]
     public bool isOnGround = true;
-    /// Air drag
+    /// Drag value while in air
     public float dragAir = 0f;
+    /// Angular drag value while in air
     public float angularDragAir = 0f;
+    /// Drag value while on the ground
     public float dragGround = 0.25f;
+    /// Angular drag value while on the ground
     public float angularDragGround = 0.2f;
+    /// Drag value while player is trying to stop
     public float dragStop = 1.2f;
+    /// Angular drag value while player is trying to stop
     public float angularDragStop = 1.0f;
 
     void Start()
