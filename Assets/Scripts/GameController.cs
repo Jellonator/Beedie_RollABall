@@ -9,8 +9,8 @@ public class GameController : MonoBehaviour
     public GameObject compassReference;
     /// Reference to the Camera itself
     public GameObject cameraReference;
-    /// Reference to the Camera's parent
-    public GameObject cameraParentReference;
+    /// Reference to camera's controller
+    private CameraController cameraController;
     /// Reference to the player
     public GameObject playerReference;
     /// Reference to PlayerController
@@ -31,6 +31,8 @@ public class GameController : MonoBehaviour
     private bool mouseDown = false;
     /// Mouse offset
     private Vector2 mouseOffset = Vector2.zero;
+    /// View rotation
+    private float viewRotation = 45f;
 
     void Start()
     {
@@ -40,6 +42,7 @@ public class GameController : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
         }
         playerController = playerReference.GetComponent<PlayerController>();
+        cameraController = cameraReference.GetComponent<CameraController>();
     }
 
     // Handle inputs
@@ -70,9 +73,9 @@ public class GameController : MonoBehaviour
         //     Input.GetAxis("Mouse Y")
         // );
         // Get the view axis to rotate the game by
-        Vector3 x_axis = cameraReference.transform.right;
-        Vector3 y_axis = cameraReference.transform.up;
-        Vector3 z_axis = cameraReference.transform.forward;
+        Vector3 x_axis = cameraController.cameraLook.transform.right;
+        Vector3 y_axis = cameraController.cameraLook.transform.up;
+        Vector3 z_axis = cameraController.cameraLook.transform.forward;
         // Previous view normal
         Vector3 prev_dir = transform.rotation * Vector3.up;
         // When the player looks left or right, rotate around the Y view axis (does not affect gravity)
@@ -81,12 +84,15 @@ public class GameController : MonoBehaviour
         transform.RotateAround(Vector3.zero, x_axis, -movement.y);
         // When the player rotates left or right, rotate around the Z view axis
         transform.RotateAround(Vector3.zero, z_axis, movement.x);
-        // mouse movement
+        // When player looks up or down, rotate view
+        viewRotation = Mathf.Clamp(viewRotation - look.y, -90f, 90f);
+        // mouse movement, similar to above
         if (mouseDown) {
             transform.RotateAround(Vector3.zero, x_axis, -mouseMovement.y * 0.25f);
             transform.RotateAround(Vector3.zero, z_axis, mouseMovement.x * 0.25f);
         } else {
             transform.RotateAround(Vector3.zero, y_axis, mouseMovement.x * 0.25f);
+            viewRotation = Mathf.Clamp(viewRotation - mouseMovement.y * 0.25f, -90f, 90f);
         }
         // When the player rotates the view such that:
         //  * The new rotation is approaching the player's ground normal
@@ -136,10 +142,12 @@ public class GameController : MonoBehaviour
             }
         }
         // Rotate the camera
-        cameraParentReference.transform.rotation = transform.rotation;
+        cameraController.cameraRoot.transform.rotation = transform.rotation;
         // Rotate gravity
         Physics.gravity = transform.rotation * baseGravity;
         // Rotate the compass
         compassReference.transform.rotation = Quaternion.Inverse(transform.rotation);
+        // Set view rotation
+        cameraController.cameraRotation.transform.localEulerAngles = new Vector3(viewRotation, 0, 0);
     }
 }
